@@ -24,53 +24,85 @@ class BusinessCard extends StatelessWidget {
           color: Colors.white,
           child: CustomPaint(
             painter: CurvePainter(),
-            child: Column(
-              children: [
-                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                Container(
-                  padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                  child: CircleAvatar(
-                    radius: MediaQuery.of(context).size.width * 0.09,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0, vertical: 40.0), // Added padding
+              child: Column(
+                children: [
+                  CircleAvatar(
+                    radius: MediaQuery.of(context).size.width *
+                        0.15, // Increased size
                     backgroundColor: Colors.white,
                     child: CircleAvatar(
-                      radius: MediaQuery.of(context).size.width * 0.08,
+                      radius: MediaQuery.of(context).size.width *
+                          0.14, // Increased size
                       backgroundImage: NetworkImage(photoUrl),
                     ),
                   ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  name.isNotEmpty ? name : 'Your Name',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                    letterSpacing: 1.15,
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      const Icon(Icons.person,
+                          color: Colors.black, size: 24), // Icon for name
+                      const SizedBox(width: 8), // Spacing between icon and text
+                      Expanded(
+                        child: Text(
+                          name.isNotEmpty ? name : 'Your Name',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize:
+                                26, // Increased font size for better visibility
+                            letterSpacing: 1.15,
+                            color: Colors.black, // Changed to black
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(height: 5),
-                Text(
-                  email.isNotEmpty ? email : 'Your Email',
-                  style: TextStyle(
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.email,
+                          color: Colors.black, size: 24), // Icon for email
+                      const SizedBox(width: 8), // Spacing between icon and text
+                      Expanded(
+                        child: Text(
+                          email.isNotEmpty ? email : 'Your Email',
+                          style: TextStyle(
+                            color: Colors.black, // Changed to black
+                            fontSize: 18, // Increased font size for email
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.phone,
+                          color: Colors.black,
+                          size: 24), // Icon for phone number
+                      const SizedBox(width: 8), // Spacing between icon and text
+                      Expanded(
+                        child: Text(
+                          phone.isNotEmpty ? phone : 'Your Phone',
+                          style: TextStyle(
+                            color: Colors.black, // Changed to black
+                            fontSize: 18, // Increased font size for phone
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 15),
+                  Divider(
+                    indent: MediaQuery.of(context).size.width * 0.1,
+                    endIndent: MediaQuery.of(context).size.width * 0.1,
                     color: Colors.grey.shade400,
-                    fontSize: 16,
+                    thickness: 1,
                   ),
-                ),
-                SizedBox(height: 5),
-                Text(
-                  phone.isNotEmpty ? phone : 'Your Phone',
-                  style: TextStyle(
-                    color: Colors.grey.shade400,
-                    fontSize: 16,
-                  ),
-                ),
-                SizedBox(height: 15),
-                Divider(
-                  indent: MediaQuery.of(context).size.width * 0.1,
-                  endIndent: MediaQuery.of(context).size.width * 0.1,
-                  color: Colors.grey.shade400,
-                  thickness: 1,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -85,11 +117,14 @@ class CurvePainter extends CustomPainter {
     var paint = Paint();
     paint.style = PaintingStyle.fill;
     paint.shader = LinearGradient(
-      colors: [Color(0xff8160c7), Color(0xff8f77dc), Color(0xff8f67bc)],
+      colors: [
+        Color.fromARGB(255, 3, 101, 146),
+        Colors.blueAccent
+      ], // Using your primary color
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     ).createShader(Rect.fromLTRB(0, 0, size.width, size.height));
-    
+
     var path = Path();
     path.moveTo(0, size.height * 0.15);
     path.quadraticBezierTo(
