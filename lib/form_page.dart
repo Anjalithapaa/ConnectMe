@@ -12,6 +12,8 @@ class _FormPageState extends State<FormPage> {
   String email = '';
   String phone = '';
   String photoUrl = '';
+  String title = '';
+  String organization = '';
 
   @override
   Widget build(BuildContext context) {
@@ -101,6 +103,29 @@ class _FormPageState extends State<FormPage> {
                     photoUrl = value;
                   });
                 }),
+                const SizedBox(height: 16,),
+                _buildTextField('Organization','Enter your organization',(value){
+                  if(value == null || value.isEmpty){
+                    return 'Please Enter your Organization';
+                  }
+                  return null;
+                },(value){
+                  setState(() {
+                    organization = value;
+                  });
+                }),
+                const SizedBox(height: 16,),
+                _buildTextField('Title','Enter your Title',(value){
+                  if(value == null || value.isEmpty){
+                    return 'Please Enter your Title';
+                  }
+                  return null;
+                },(value){
+                  setState(() {
+                    title = value;
+                  });
+                }),
+
                 const SizedBox(height: 30),
                 ElevatedButton(
                   onPressed: () {
@@ -113,6 +138,10 @@ class _FormPageState extends State<FormPage> {
                             email: email,
                             phone: phone,
                             photoUrl: photoUrl,
+                            organization: organization,
+                            title: title,
+                            
+
                           ),
                         ),
                       );
