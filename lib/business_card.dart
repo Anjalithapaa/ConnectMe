@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'qrcode.dart';
 
 class BusinessCard extends StatelessWidget {
   final String name;
@@ -9,7 +10,8 @@ class BusinessCard extends StatelessWidget {
   final String organization;
   final String title;
 
-  BusinessCard({
+  const BusinessCard({
+    super.key,
     required this.name,
     required this.email,
     required this.phone,
@@ -62,7 +64,7 @@ class BusinessCard extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 name.isNotEmpty ? name : 'Your Name',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 26,
                                   letterSpacing: 1.15,
@@ -86,7 +88,7 @@ class BusinessCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           email.isNotEmpty ? email : 'Your Email',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 18,
                           ),
@@ -102,7 +104,7 @@ class BusinessCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           phone.isNotEmpty ? phone : 'Your Phone',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 18,
                           ),
@@ -121,7 +123,7 @@ class BusinessCard extends StatelessWidget {
                           organization.isNotEmpty
                               ? organization
                               : 'Your Organization',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 18,
                           ),
@@ -137,7 +139,7 @@ class BusinessCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           title.isNotEmpty ? title : 'Your Title',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 18,
                           ),
@@ -152,6 +154,27 @@ class BusinessCard extends StatelessWidget {
                     color: Colors.grey.shade400,
                     thickness: 1,
                   ),
+                  Center(
+                      child: ElevatedButton(
+                    child: Text('Share Your Info'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QRCodeScreen(
+                            name: name,
+                            email: email,
+                            phone: phone,
+                            photoUrl: photoUrl,
+                            organization: organization,
+                            title: title,
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.red, elevation: 0),
+                  )),
                 ],
               ),
             ),
@@ -167,7 +190,7 @@ class CurvePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     var paint = Paint();
     paint.style = PaintingStyle.fill;
-    paint.shader = LinearGradient(
+    paint.shader = const LinearGradient(
       colors: [Color.fromARGB(255, 3, 101, 146), Colors.blueAccent],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,

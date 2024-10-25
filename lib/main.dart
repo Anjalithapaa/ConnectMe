@@ -7,7 +7,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -107,7 +107,7 @@ class _HomePageState extends State<HomePage>
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30),
                             gradient: SweepGradient(
-                              colors: [
+                              colors: const [
                                 Colors.redAccent,
                                 Colors.orangeAccent,
                                 Colors.yellowAccent,
@@ -139,6 +139,14 @@ class _HomePageState extends State<HomePage>
                           MaterialPageRoute(builder: (context) => FormPage()),
                         );
                       },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.blueGrey,
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        elevation: 5,
+                      ),
                       child: const Padding(
                         padding: EdgeInsets.symmetric(
                             vertical: 12.0, horizontal: 30.0),
@@ -147,14 +155,6 @@ class _HomePageState extends State<HomePage>
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.w600),
                         ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.blueGrey,
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        elevation: 5,
                       ),
                     ),
                   ],
