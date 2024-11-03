@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "387690996746",
+    "project_id": "connectme-7ab22",
+    "storage_bucket": "connectme-7ab22.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:387690996746:android:86f0b32beda06c49b6abf3",
+        "android_client_info": {
+          "package_name": "com.ConnectMe.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "387690996746-o03b6v9obkmkprovg0jdk3abiqugdum2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAd5NENP3v_owFlypGX9eTveQju8Nj66Ec"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "387690996746-o03b6v9obkmkprovg0jdk3abiqugdum2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "387690996746-1q94teci6enuc9sdhggtub11car3s4u4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.connectMe"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
