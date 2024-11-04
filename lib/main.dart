@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'business_card.dart';
 import 'form_page.dart';
+import 'signin.dart'; 
+import 'signup.dart'; 
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -21,7 +31,53 @@ class MyApp extends StatelessWidget {
           titleLarge: TextStyle(color: Colors.black),
         ),
       ),
-      home: const HomePage(),
+      home: const AuthChecker(), 
+    );
+  }
+}
+
+class AuthChecker extends StatelessWidget {
+  const AuthChecker({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.active) {
+          final User? user = snapshot.data;
+          if (user == null) {
+            // If user is not signed in, show HomePage with sign-in and sign-up options
+            return const HomePage();
+          } else {
+            // User is signed in, check if profile exists
+           return FutureBuilder<DocumentSnapshot>(
+  future: FirebaseFirestore.instance.collection('users').doc(user.uid).get(),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.done) {
+      if (snapshot.data != null && snapshot.data!.exists) {
+        final userData = snapshot.data!.data() as Map<String, dynamic>;
+        return BusinessCard(
+          name: userData['name'] ?? '',
+          email: userData['email'] ?? '',
+          phone: userData['phone'] ?? '',
+          photoUrl: userData['photoUrl'] ?? '',
+          organization: userData['organization'] ?? '',
+          title: userData['title'] ?? '',
+        );
+      } else {
+        // If profile data doesn't exist, navigate to FormPage
+        return FormPage();
+      }
+    }
+    return const Center(child: CircularProgressIndicator());
+  },
+);
+
+          }
+        }
+        return const Center(child: CircularProgressIndicator());
+      },
     );
   }
 }
@@ -80,7 +136,7 @@ class _HomePageState extends State<HomePage>
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Text(
-                  'Create Your Digital ICard!',
+                  'Welcome to ConnectMe!',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -106,56 +162,67 @@ class _HomePageState extends State<HomePage>
                           height: 60,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30),
-                            gradient: SweepGradient(
-                              colors: const [
-                                Colors.redAccent,
-                                Colors.orangeAccent,
-                                Colors.yellowAccent,
-                                Colors.greenAccent,
-                                Colors.blueAccent,
-                                Colors.purpleAccent,
-                                Colors.redAccent,
-                              ],
-                              stops: const [
-                                0.0,
-                                0.17,
-                                0.33,
-                                0.5,
-                                0.67,
-                                0.83,
-                                1.0
-                              ],
-                              transform:
-                                  GradientRotation(_controller.value * 3.14),
-                            ),
+                            
                           ),
                         );
                       },
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => FormPage()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.blueGrey,
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const SignInPage()),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.blueGrey,
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            elevation: 5,
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12.0, horizontal: 20.0),
+                            child: Text(
+                              'Sign In',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w600),
+                            ),
+                          ),
                         ),
-                        elevation: 5,
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 12.0, horizontal: 30.0),
-                        child: Text(
-                          'Get Started',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w600),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const SignUpPage()),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.blueGrey,
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            elevation: 5,
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12.0, horizontal: 20.0),
+                            child: Text(
+                              'Sign Up',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w600),
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
@@ -168,7 +235,7 @@ class _HomePageState extends State<HomePage>
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 40), // Spacing before the copyright
+                const SizedBox(height: 40),
                 const Text(
                   '© Everest, Pao’s 401 Class',
                   style: TextStyle(

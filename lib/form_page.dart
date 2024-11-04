@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'business_card.dart';
 
 class FormPage extends StatefulWidget {
@@ -14,6 +16,52 @@ class _FormPageState extends State<FormPage> {
   String photoUrl = '';
   String title = '';
   String organization = '';
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData(); // Load user data when the form is initialized
+  }
+
+  Future<void> _loadUserData() async {
+    // Get the current user (could be anonymous)
+    User? user = _auth.currentUser;
+
+    if (user != null) {
+      // Fetch user data from Firestore
+      DocumentSnapshot doc = await _firestore.collection('users').doc(user.uid).get();
+      if (doc.exists) {
+        // Populate the fields with existing data
+        setState(() {
+          name = doc['name'];
+          email = doc['email'];
+          phone = doc['phone'];
+          photoUrl = doc['photoUrl'];
+          title = doc['title'];
+          organization = doc['organization'];
+        });
+      }
+    }
+  }
+
+  Future<void> _saveUserData() async {
+    User? user = _auth.currentUser;
+
+    if (user != null) {
+      // Save user data to Firestore
+      await _firestore.collection('users').doc(user.uid).set({
+        'name': name,
+        'email': email,
+        'phone': phone,
+        'photoUrl': photoUrl,
+        'title': title,
+        'organization': organization,
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +99,9 @@ class _FormPageState extends State<FormPage> {
                     color: Colors.white,
                     shadows: [
                       Shadow(
-                        color: Colors.black54, // Shadow color
-                        offset: Offset(2, 2), // Position of the shadow
-                        blurRadius: 4, // How blurred the shadow is
+                        color: Colors.black54,
+                        offset: Offset(2, 2),
+                        blurRadius: 4,
                       ),
                     ],
                   ),
@@ -81,8 +129,7 @@ class _FormPageState extends State<FormPage> {
                   });
                 }),
                 const SizedBox(height: 16),
-                _buildTextField('Phone Number', 'Enter your phone number',
-                    (value) {
+                _buildTextField('Phone Number', 'Enter your phone number', (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your phone number';
                   }
@@ -103,33 +150,33 @@ class _FormPageState extends State<FormPage> {
                     photoUrl = value;
                   });
                 }),
-                const SizedBox(height: 16,),
-                _buildTextField('Organization','Enter your organization',(value){
-                  if(value == null || value.isEmpty){
+                const SizedBox(height: 16),
+                _buildTextField('Organization', 'Enter your organization', (value) {
+                  if (value == null || value.isEmpty) {
                     return 'Please Enter your Organization';
                   }
                   return null;
-                },(value){
+                }, (value) {
                   setState(() {
                     organization = value;
                   });
                 }),
-                const SizedBox(height: 16,),
-                _buildTextField('Title','Enter your Title',(value){
-                  if(value == null || value.isEmpty){
+                const SizedBox(height: 16),
+                _buildTextField('Title', 'Enter your Title', (value) {
+                  if (value == null || value.isEmpty) {
                     return 'Please Enter your Title';
                   }
                   return null;
-                },(value){
+                }, (value) {
                   setState(() {
                     title = value;
                   });
                 }),
-
                 const SizedBox(height: 30),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      await _saveUserData(); // Save the user data
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -140,8 +187,6 @@ class _FormPageState extends State<FormPage> {
                             photoUrl: photoUrl,
                             organization: organization,
                             title: title,
-                            
-
                           ),
                         ),
                       );
@@ -152,14 +197,13 @@ class _FormPageState extends State<FormPage> {
                     style: TextStyle(fontSize: 18),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        const Color.fromARGB(255, 3, 101, 146), // Button color
+                    backgroundColor: const Color.fromARGB(255, 3, 101, 146), // Button color
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
                     padding: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 20), // Added padding
+                        vertical: 12, horizontal: 20),
                     elevation: 5,
                   ),
                 ),
@@ -171,29 +215,22 @@ class _FormPageState extends State<FormPage> {
     );
   }
 
-  Widget _buildTextField(String label, String hint,
-      FormFieldValidator<String>? validator, ValueChanged<String>? onChanged) {
+  Widget _buildTextField(String label, String hint, FormFieldValidator<String>? validator, ValueChanged<String>? onChanged) {
     return TextFormField(
       decoration: InputDecoration(
         labelText: label,
-        hintText: hint, // Placeholder text
-        hintStyle:
-            const TextStyle(color: Colors.black54), // Changed placeholder color
-        labelStyle: const TextStyle(
-            color: Color.fromARGB(
-                255, 3, 101, 146)), // Label color changed to your primary color
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.black54),
+        labelStyle: const TextStyle(color: Color.fromARGB(255, 3, 101, 146)),
         enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(
-              color: Color.fromARGB(
-                  255, 3, 101, 146)), // Border color changed to primary color
-          borderRadius: BorderRadius.circular(10), // Rounded corners
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(
-              color: Color.fromARGB(255, 3, 101, 146)), // Focused border color
+          borderSide: const BorderSide(color: Color.fromARGB(255, 3, 101, 146)),
           borderRadius: BorderRadius.circular(10),
         ),
-        fillColor: Colors.white, // Background color
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Color.fromARGB(255, 3, 101, 146)),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        fillColor: Colors.white,
         filled: true,
       ),
       validator: validator,
