@@ -1,3 +1,4 @@
+import 'package:connect_me/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'qrcode.dart';
@@ -19,10 +20,21 @@ class BusinessCard extends StatelessWidget {
     required this.organization,
     required this.title,
   });
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
+          },
+        ),
+        backgroundColor: const Color.fromARGB(255, 3, 101, 146),
+        elevation: 0,
+      ),
       body: SingleChildScrollView(
         child: Container(
           width: MediaQuery.of(context).size.width,

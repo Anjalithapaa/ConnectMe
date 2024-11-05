@@ -29,7 +29,31 @@ class _SignUpPageState extends State<SignUpPage> {
           'email': _emailController.text,
           'createdAt': DateTime.now(),
         });
-        // Navigate to FormPage or another page as needed
+
+        // Show success message
+        if (mounted) {
+          // Check if widget is still mounted
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.white),
+                  SizedBox(width: 8),
+                  Text('Successfully signed up!'),
+                ],
+              ),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          );
+        }
+
+        // Navigate to FormPage
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => FormPage()),
@@ -37,7 +61,27 @@ class _SignUpPageState extends State<SignUpPage> {
       }
     } catch (e) {
       print("Sign-up error: $e");
-      // Display error message or handle errors as needed
+      // Show error message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error, color: Colors.white),
+                const SizedBox(width: 8),
+                Text('Error: ${e.toString()}'),
+              ],
+            ),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(10),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      }
     }
   }
 
