@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'business_card.dart';
 import 'form_page.dart';
-import 'signin.dart'; 
-import 'signup.dart'; 
+import 'signin.dart';
+import 'signup.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
           titleLarge: TextStyle(color: Colors.black),
         ),
       ),
-      home: const AuthChecker(), 
+      home: const AuthChecker(),
     );
   }
 }
@@ -47,33 +47,33 @@ class AuthChecker extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.active) {
           final User? user = snapshot.data;
           if (user == null) {
-            // If user is not signed in, show HomePage with sign-in and sign-up options
-            return const HomePage();
+            return const HomePage(); // Show homepage with sign in/up buttons
           } else {
-            // User is signed in, check if profile exists
-           return FutureBuilder<DocumentSnapshot>(
-  future: FirebaseFirestore.instance.collection('users').doc(user.uid).get(),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.done) {
-      if (snapshot.data != null && snapshot.data!.exists) {
-        final userData = snapshot.data!.data() as Map<String, dynamic>;
-        return BusinessCard(
-          name: userData['name'] ?? '',
-          email: userData['email'] ?? '',
-          phone: userData['phone'] ?? '',
-          photoUrl: userData['photoUrl'] ?? '',
-          organization: userData['organization'] ?? '',
-          title: userData['title'] ?? '',
-        );
-      } else {
-        // If profile data doesn't exist, navigate to FormPage
-        return FormPage();
-      }
-    }
-    return const Center(child: CircularProgressIndicator());
-  },
-);
-
+            return FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(user.uid)
+                  .get(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.data != null && snapshot.data!.exists) {
+                    final userData =
+                        snapshot.data!.data() as Map<String, dynamic>;
+                    return BusinessCard(
+                      name: userData['name'] ?? '',
+                      email: userData['email'] ?? '',
+                      phone: userData['phone'] ?? '',
+                      photoUrl: userData['photoUrl'] ?? '',
+                      organization: userData['organization'] ?? '',
+                      title: userData['title'] ?? '',
+                    );
+                  } else {
+                    return FormPage();
+                  }
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
+            );
           }
         }
         return const Center(child: CircularProgressIndicator());
@@ -162,7 +162,6 @@ class _HomePageState extends State<HomePage>
                           height: 60,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30),
-                            
                           ),
                         );
                       },
@@ -237,12 +236,150 @@ class _HomePageState extends State<HomePage>
                 ),
                 const SizedBox(height: 40),
                 const Text(
-                  '© Everest, Pao’s 401 Class',
+                  "© Everest, Pao's 401 Class",
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.white70,
                   ),
                   textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AuthenticatedHomePage extends StatelessWidget {
+  final String userName;
+
+  const AuthenticatedHomePage({
+    super.key,
+    required this.userName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('ConnectMe'),
+        automaticallyImplyLeading: false, // Removes back button
+        backgroundColor: const Color.fromARGB(255, 3, 101, 146),
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.blueAccent.withOpacity(0.8),
+              Colors.blue.withOpacity(0.7),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Welcome back, $userName!',
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black54,
+                        blurRadius: 10.0,
+                        offset: Offset(2.0, 2.0),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 30),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => FutureBuilder<DocumentSnapshot>(
+                          future: FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(FirebaseAuth.instance.currentUser!.uid)
+                              .get(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              final userData =
+                                  snapshot.data!.data() as Map<String, dynamic>;
+                              return BusinessCard(
+                                name: userData['name'] ?? '',
+                                email: userData['email'] ?? '',
+                                phone: userData['phone'] ?? '',
+                                photoUrl: userData['photoUrl'] ?? '',
+                                organization: userData['organization'] ?? '',
+                                title: userData['title'] ?? '',
+                              );
+                            }
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.blueGrey,
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12.0,
+                      horizontal: 30.0,
+                    ),
+                  ),
+                  child: const Text(
+                    'View Business Card',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () async {
+                    await FirebaseAuth.instance.signOut();
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (context) => const HomePage(),
+                      ),
+                      (route) => false,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.blueGrey,
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12.0,
+                      horizontal: 30.0,
+                    ),
+                  ),
+                  child: const Text(
+                    'Sign Out',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ],
             ),
