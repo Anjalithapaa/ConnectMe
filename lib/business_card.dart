@@ -1,7 +1,9 @@
-import 'package:connect_me/main.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'qrcode.dart';
+import 'main.dart'; // Add this if missing
 
 class BusinessCard extends StatelessWidget {
   final String name;
@@ -26,9 +28,17 @@ class BusinessCard extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
+          onPressed: () async {
+            final userData = await FirebaseFirestore.instance
+                .collection('users')
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .get();
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const HomePage()),
+              MaterialPageRoute(
+                builder: (context) => AuthenticatedHomePage(
+                  userName: userData['name'] ?? 'User',
+                ),
+              ),
             );
           },
         ),
