@@ -66,6 +66,7 @@ class AuthChecker extends StatelessWidget {
                       photoUrl: userData['photoUrl'] ?? '',
                       organization: userData['organization'] ?? '',
                       title: userData['title'] ?? '',
+                      linkedIn:userData['linkedIn']?? ''
                     );
                   } else {
                     return FormPage();
@@ -322,6 +323,7 @@ class AuthenticatedHomePage extends StatelessWidget {
                                 photoUrl: userData['photoUrl'] ?? '',
                                 organization: userData['organization'] ?? '',
                                 title: userData['title'] ?? '',
+                                linkedIn: userData ['linkedIn'] ?? '',
                               );
                             }
                             return const Center(

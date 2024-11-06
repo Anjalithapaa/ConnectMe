@@ -13,6 +13,7 @@ class _FormPageState extends State<FormPage> {
   String name = '';
   String email = '';
   String phone = '';
+  String linkedIn = '';
   String photoUrl = '';
   String title = '';
   String organization = '';
@@ -20,7 +21,7 @@ class _FormPageState extends State<FormPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  @override
+  @override 
   void initState() {
     super.initState();
     _loadUserData(); // Load user data when the form is initialized
@@ -32,7 +33,8 @@ class _FormPageState extends State<FormPage> {
 
     if (user != null) {
       // Fetch user data from Firestore
-      DocumentSnapshot doc = await _firestore.collection('users').doc(user.uid).get();
+      DocumentSnapshot doc =
+          await _firestore.collection('users').doc(user.uid).get();
       if (doc.exists) {
         // Populate the fields with existing data
         setState(() {
@@ -42,6 +44,7 @@ class _FormPageState extends State<FormPage> {
           photoUrl = doc['photoUrl'];
           title = doc['title'];
           organization = doc['organization'];
+          linkedIn = doc['linkedIn'] ?? '';
         });
       }
     }
@@ -56,6 +59,7 @@ class _FormPageState extends State<FormPage> {
         'name': name,
         'email': email,
         'phone': phone,
+        'linkedIn': linkedIn, // Save LinkedIn data
         'photoUrl': photoUrl,
         'title': title,
         'organization': organization,
@@ -129,7 +133,8 @@ class _FormPageState extends State<FormPage> {
                   });
                 }),
                 const SizedBox(height: 16),
-                _buildTextField('Phone Number', 'Enter your phone number', (value) {
+                _buildTextField('Phone Number', 'Enter your phone number',
+                    (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your phone number';
                   }
@@ -137,6 +142,17 @@ class _FormPageState extends State<FormPage> {
                 }, (value) {
                   setState(() {
                     phone = value;
+                  });
+                }),
+                const SizedBox(height: 16),
+                _buildTextField('LinkedIn', 'Enter LinkedIn URL', (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your LinkedIn URL';
+                  }
+                  return null;
+                }, (value) {
+                  setState(() {
+                    linkedIn = value;
                   });
                 }),
                 const SizedBox(height: 16),
@@ -151,7 +167,8 @@ class _FormPageState extends State<FormPage> {
                   });
                 }),
                 const SizedBox(height: 16),
-                _buildTextField('Organization', 'Enter your organization', (value) {
+                _buildTextField('Organization', 'Enter your organization',
+                    (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please Enter your Organization';
                   }
@@ -187,6 +204,7 @@ class _FormPageState extends State<FormPage> {
                             photoUrl: photoUrl,
                             organization: organization,
                             title: title,
+                            linkedIn: linkedIn,
                           ),
                         ),
                       );
@@ -197,7 +215,8 @@ class _FormPageState extends State<FormPage> {
                     style: TextStyle(fontSize: 18),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 3, 101, 146), // Button color
+                    backgroundColor:
+                        const Color.fromARGB(255, 3, 101, 146), // Button color
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -215,7 +234,8 @@ class _FormPageState extends State<FormPage> {
     );
   }
 
-  Widget _buildTextField(String label, String hint, FormFieldValidator<String>? validator, ValueChanged<String>? onChanged) {
+  Widget _buildTextField(String label, String hint,
+      FormFieldValidator<String>? validator, ValueChanged<String>? onChanged) {
     return TextFormField(
       decoration: InputDecoration(
         labelText: label,

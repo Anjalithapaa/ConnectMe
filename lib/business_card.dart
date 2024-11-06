@@ -1,14 +1,16 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'qrcode.dart';
-import 'main.dart'; // Add this if missing
+import 'main.dart';
 
 class BusinessCard extends StatelessWidget {
   final String name;
   final String email;
   final String phone;
+  final String linkedIn; 
   final String photoUrl;
   final String organization;
   final String title;
@@ -21,7 +23,18 @@ class BusinessCard extends StatelessWidget {
     required this.photoUrl,
     required this.organization,
     required this.title,
+    required this.linkedIn,
   });
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,11 +69,8 @@ class BusinessCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 70.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(
-                      height: MediaQuery.of(context).size.height *
-                          0.2), // Adjust the gap at the top
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.2),
                   Center(
                     child: CircleAvatar(
                       radius: MediaQuery.of(context).size.width * 0.15,
@@ -71,17 +81,14 @@ class BusinessCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20), // Extra space below avatar
-
-                  // Moved the name's portion below the blue background
+                  const SizedBox(height: 20),
                   Container(
                     margin: const EdgeInsets.only(top: 10.0),
                     child: Column(
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.person,
-                                color: Colors.black, size: 24),
+                            const Icon(Icons.person, color: Colors.black, size: 24),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -96,23 +103,24 @@ class BusinessCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(
-                            height: 20), // Increased spacing between rows
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
-
-                  // Other rows for email, phone, organization, title
                   Row(
                     children: [
                       const Icon(Icons.email, color: Colors.black, size: 24),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: Text(
-                          email.isNotEmpty ? email : 'Your Email',
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
+                        child: GestureDetector(
+                          onTap: () => _launchUrl('mailto:$email'),
+                          child: Text(
+                            email.isNotEmpty ? email : 'Your Email',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
                       ),
@@ -124,11 +132,15 @@ class BusinessCard extends StatelessWidget {
                       const Icon(Icons.phone, color: Colors.black, size: 24),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: Text(
-                          phone.isNotEmpty ? phone : 'Your Phone',
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
+                        child: GestureDetector(
+                          onTap: () => _launchUrl('tel:$phone'),
+                          child: Text(
+                            phone.isNotEmpty ? phone : 'Your Phone',
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                         ),
                       ),
@@ -137,14 +149,11 @@ class BusinessCard extends StatelessWidget {
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      const Icon(Icons.corporate_fare,
-                          color: Colors.black, size: 24),
+                      const Icon(Icons.corporate_fare, color: Colors.black, size: 24),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          organization.isNotEmpty
-                              ? organization
-                              : 'Your Organization',
+                          organization.isNotEmpty ? organization : 'Your Organization',
                           style: const TextStyle(
                             color: Colors.black,
                             fontSize: 18,
@@ -170,6 +179,15 @@ class BusinessCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 25),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: const Icon(FontAwesomeIcons.linkedin, color: Colors.blue, size: 30),
+                        onPressed: () => _launchUrl(linkedIn),
+                      ),
+                    ],
+                  ),
                   Divider(
                     indent: MediaQuery.of(context).size.width * 0.1,
                     endIndent: MediaQuery.of(context).size.width * 0.1,
@@ -177,26 +195,30 @@ class BusinessCard extends StatelessWidget {
                     thickness: 1,
                   ),
                   Center(
-                      child: ElevatedButton(
-                    child: Text('Share Your Info'),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => QRCodeScreen(
-                            name: name,
-                            email: email,
-                            phone: phone,
-                            photoUrl: photoUrl,
-                            organization: organization,
-                            title: title,
+                    child: ElevatedButton(
+                      child: const Text('Share Your Info'),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QRCodeScreen(
+                              name: name,
+                              email: email,
+                              phone: phone,
+                              linkedIn: linkedIn,
+                              photoUrl: photoUrl,
+                              organization: organization,
+                              title: title,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.red, elevation: 0),
-                  )),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.red,
+                        elevation: 0,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -210,25 +232,25 @@ class BusinessCard extends StatelessWidget {
 class CurvePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    var paint = Paint();
-    paint.style = PaintingStyle.fill;
-    paint.shader = const LinearGradient(
-      colors: [Color.fromARGB(255, 3, 101, 146), Colors.blueAccent],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    ).createShader(Rect.fromLTRB(0, 0, size.width, size.height));
+    final paint = Paint()
+      ..shader = const LinearGradient(
+        colors: [Color.fromARGB(255, 3, 101, 146), Colors.blueAccent],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ).createShader(Rect.fromLTRB(0, 0, size.width, size.height))
+      ..style = PaintingStyle.fill;
 
-    var path = Path();
-    path.moveTo(0, size.height * 0.15);
-    path.quadraticBezierTo(
-        size.width * 0.48, size.height * 0.38, size.width, size.height * 0.25);
-    path.lineTo(size.width, 0);
-    path.lineTo(0, 0);
+    final path = Path()
+      ..moveTo(0, size.height * 0.15)
+      ..quadraticBezierTo(size.width * 0.48, size.height * 0.38, size.width, size.height * 0.25)
+      ..lineTo(size.width, 0)
+      ..lineTo(0, 0);
+
     canvas.drawPath(path, paint);
   }
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
+    return false;
   }
 }
