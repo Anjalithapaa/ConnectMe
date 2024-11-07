@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.connect_me" >
+<uses-sdk android:minSdkVersion="23" />
     <application
         android:label="connect_me"
         android:name="${applicationName}"
