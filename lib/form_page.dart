@@ -45,7 +45,6 @@ class _FormPageState extends State<FormPage> {
           name = doc['name'];
           email = doc['email'];
           phone = doc['phone'];
-          photoUrl = doc['photoUrl'];
           title = doc['title'];
           organization = doc['organization'];
           linkedIn = doc['linkedIn'] ?? '';
@@ -76,7 +75,6 @@ class _FormPageState extends State<FormPage> {
         'email': email,
         'phone': phone,
         'linkedIn': linkedIn, // Save LinkedIn data
-        'photoUrl': photoUrl,
         'title': title,
         'organization': organization,
       });
@@ -223,7 +221,7 @@ class _FormPageState extends State<FormPage> {
                             name: name,
                             email: email,
                             phone: phone,
-                            photoUrl: photoUrl,
+                            photoUrl: _selectedImage?.path ?? '',
                             organization: organization,
                             title: title,
                             linkedIn: linkedIn,
