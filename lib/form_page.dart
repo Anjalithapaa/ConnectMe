@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'business_card.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io'; // For using File class
+import 'dart:typed_data'; // Import for Uint8List
+import 'business_card.dart';
 
 class FormPage extends StatefulWidget {
   const FormPage({super.key});
@@ -20,7 +20,7 @@ class _FormPageState extends State<FormPage> {
   String linkedIn = '';
   String title = '';
   String organization = '';
-  File? _selectedImage; // Store the uploaded image
+  Uint8List? _selectedImageBytes; // Store the uploaded image bytes
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -59,8 +59,11 @@ class _FormPageState extends State<FormPage> {
         await _picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
+      Uint8List imageBytes =
+          await pickedFile.readAsBytes(); // Read the image as bytes
+
       setState(() {
-        _selectedImage = File(pickedFile.path);
+        _selectedImageBytes = imageBytes; // Store the image bytes
       });
     }
   }
@@ -169,6 +172,7 @@ class _FormPageState extends State<FormPage> {
                     linkedIn = value;
                   });
                 }),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     ElevatedButton(
@@ -176,9 +180,9 @@ class _FormPageState extends State<FormPage> {
                       child: const Text('Upload Photo'),
                     ),
                     const SizedBox(width: 10),
-                    _selectedImage != null
-                        ? Image.file(
-                            _selectedImage!,
+                    _selectedImageBytes != null
+                        ? Image.memory(
+                            _selectedImageBytes!,
                             width: 100,
                             height: 100,
                             fit: BoxFit.cover,
@@ -190,7 +194,7 @@ class _FormPageState extends State<FormPage> {
                 _buildTextField('Organization', 'Enter your organization',
                     (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please Enter your Organization';
+                    return 'Please enter your organization';
                   }
                   return null;
                 }, (value) {
@@ -199,9 +203,9 @@ class _FormPageState extends State<FormPage> {
                   });
                 }),
                 const SizedBox(height: 16),
-                _buildTextField('Title', 'Enter your Title', (value) {
+                _buildTextField('Title', 'Enter your title', (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please Enter your Title';
+                    return 'Please enter your title';
                   }
                   return null;
                 }, (value) {
@@ -221,7 +225,9 @@ class _FormPageState extends State<FormPage> {
                             name: name,
                             email: email,
                             phone: phone,
-                            photoUrl: _selectedImage?.path ?? '',
+                            photoUrl: _selectedImageBytes != null
+                                ? String.fromCharCodes(_selectedImageBytes!)
+                                : '', // Ensure this logic matches how you handle the image in BusinessCard
                             organization: organization,
                             title: title,
                             linkedIn: linkedIn,
@@ -238,7 +244,9 @@ class _FormPageState extends State<FormPage> {
                       borderRadius: BorderRadius.circular(30),
                     ),
                     padding: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 20),
+                      vertical: 12,
+                      horizontal: 20,
+                    ),
                     elevation: 5,
                   ),
                   child: const Text(
@@ -254,8 +262,12 @@ class _FormPageState extends State<FormPage> {
     );
   }
 
-  Widget _buildTextField(String label, String hint,
-      FormFieldValidator<String>? validator, ValueChanged<String>? onChanged) {
+  Widget _buildTextField(
+    String label,
+    String hint,
+    String? Function(String?)? validator,
+    void Function(String)? onChanged,
+  ) {
     return TextFormField(
       decoration: InputDecoration(
         labelText: label,
