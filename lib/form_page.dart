@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'business_card.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io'; // For using File class
 
 class FormPage extends StatefulWidget {
+  const FormPage({super.key});
+
   @override
   _FormPageState createState() => _FormPageState();
 }
@@ -14,14 +18,14 @@ class _FormPageState extends State<FormPage> {
   String email = '';
   String phone = '';
   String linkedIn = '';
-  String photoUrl = '';
   String title = '';
   String organization = '';
+  File? _selectedImage; // Store the uploaded image
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  @override 
+  @override
   void initState() {
     super.initState();
     _loadUserData(); // Load user data when the form is initialized
@@ -47,6 +51,18 @@ class _FormPageState extends State<FormPage> {
           linkedIn = doc['linkedIn'] ?? '';
         });
       }
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? pickedFile =
+        await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
     }
   }
 
@@ -155,17 +171,23 @@ class _FormPageState extends State<FormPage> {
                     linkedIn = value;
                   });
                 }),
-                const SizedBox(height: 16),
-                _buildTextField('Photo URL', 'Enter photo URL', (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a photo URL';
-                  }
-                  return null;
-                }, (value) {
-                  setState(() {
-                    photoUrl = value;
-                  });
-                }),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: _pickImage,
+                      child: const Text('Upload Photo'),
+                    ),
+                    const SizedBox(width: 10),
+                    _selectedImage != null
+                        ? Image.file(
+                            _selectedImage!,
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          )
+                        : const Text('No image selected'),
+                  ],
+                ),
                 const SizedBox(height: 16),
                 _buildTextField('Organization', 'Enter your organization',
                     (value) {
@@ -210,10 +232,6 @@ class _FormPageState extends State<FormPage> {
                       );
                     }
                   },
-                  child: const Text(
-                    'Create ICard',
-                    style: TextStyle(fontSize: 18),
-                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
                         const Color.fromARGB(255, 3, 101, 146), // Button color
@@ -224,6 +242,10 @@ class _FormPageState extends State<FormPage> {
                     padding: const EdgeInsets.symmetric(
                         vertical: 12, horizontal: 20),
                     elevation: 5,
+                  ),
+                  child: const Text(
+                    'Create ICard',
+                    style: TextStyle(fontSize: 18),
                   ),
                 ),
               ],

@@ -10,7 +10,7 @@ class BusinessCard extends StatelessWidget {
   final String name;
   final String email;
   final String phone;
-  final String linkedIn; 
+  final String linkedIn;
   final String photoUrl;
   final String organization;
   final String title;
@@ -88,7 +88,8 @@ class BusinessCard extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.person, color: Colors.black, size: 24),
+                            const Icon(Icons.person,
+                                color: Colors.black, size: 24),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -149,11 +150,14 @@ class BusinessCard extends StatelessWidget {
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      const Icon(Icons.corporate_fare, color: Colors.black, size: 24),
+                      const Icon(Icons.corporate_fare,
+                          color: Colors.black, size: 24),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          organization.isNotEmpty ? organization : 'Your Organization',
+                          organization.isNotEmpty
+                              ? organization
+                              : 'Your Organization',
                           style: const TextStyle(
                             color: Colors.black,
                             fontSize: 18,
@@ -183,7 +187,8 @@ class BusinessCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton(
-                        icon: const Icon(FontAwesomeIcons.linkedin, color: Colors.blue, size: 30),
+                        icon: const Icon(FontAwesomeIcons.linkedin,
+                            color: Colors.blue, size: 30),
                         onPressed: () => _launchUrl(linkedIn),
                       ),
                     ],
@@ -196,7 +201,6 @@ class BusinessCard extends StatelessWidget {
                   ),
                   Center(
                     child: ElevatedButton(
-                      child: const Text('Share Your Info'),
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -217,6 +221,7 @@ class BusinessCard extends StatelessWidget {
                         foregroundColor: Colors.red,
                         elevation: 0,
                       ),
+                      child: const Text('Share Your Info'),
                     ),
                   ),
                 ],
@@ -242,7 +247,8 @@ class CurvePainter extends CustomPainter {
 
     final path = Path()
       ..moveTo(0, size.height * 0.15)
-      ..quadraticBezierTo(size.width * 0.48, size.height * 0.38, size.width, size.height * 0.25)
+      ..quadraticBezierTo(
+          size.width * 0.48, size.height * 0.38, size.width, size.height * 0.25)
       ..lineTo(size.width, 0)
       ..lineTo(0, 0);
 

@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-
 
 class QRCodeScreen extends StatelessWidget {
   final String name;
@@ -13,15 +11,15 @@ class QRCodeScreen extends StatelessWidget {
   final String title;
 
   const QRCodeScreen({
-    Key? key,
+    super.key,
     required this.name,
     required this.email,
     required this.phone,
     required this.photoUrl,
     required this.organization,
-    required this.title, 
+    required this.title,
     required this.linkedIn,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,12 +27,11 @@ class QRCodeScreen extends StatelessWidget {
     String qrData = "https://host-connect-me.vercel.app/contact.html?"
         "name=${Uri.encodeComponent(name)}"
         "&email=${Uri.encodeComponent(email)}"
-        "&phone=${Uri.encodeComponent(phone)}"  
+        "&phone=${Uri.encodeComponent(phone)}"
         "&linkedIn=${Uri.encodeComponent(linkedIn)}"
         "&photoUrl=${Uri.encodeComponent(photoUrl)}"
         "&organization=${Uri.encodeComponent(organization)}"
         "&title=${Uri.encodeComponent(title)}";
-        
 
     return Scaffold(
       appBar: AppBar(

@@ -60,16 +60,15 @@ class AuthChecker extends StatelessWidget {
                     final userData =
                         snapshot.data!.data() as Map<String, dynamic>;
                     return BusinessCard(
-                      name: userData['name'] ?? '',
-                      email: userData['email'] ?? '',
-                      phone: userData['phone'] ?? '',
-                      photoUrl: userData['photoUrl'] ?? '',
-                      organization: userData['organization'] ?? '',
-                      title: userData['title'] ?? '',
-                      linkedIn:userData['linkedIn']?? ''
-                    );
+                        name: userData['name'] ?? '',
+                        email: userData['email'] ?? '',
+                        phone: userData['phone'] ?? '',
+                        photoUrl: userData['photoUrl'] ?? '',
+                        organization: userData['organization'] ?? '',
+                        title: userData['title'] ?? '',
+                        linkedIn: userData['linkedIn'] ?? '');
                   } else {
-                    return FormPage();
+                    return const FormPage();
                   }
                 }
                 return const Center(child: CircularProgressIndicator());
@@ -323,7 +322,7 @@ class AuthenticatedHomePage extends StatelessWidget {
                                 photoUrl: userData['photoUrl'] ?? '',
                                 organization: userData['organization'] ?? '',
                                 title: userData['title'] ?? '',
-                                linkedIn: userData ['linkedIn'] ?? '',
+                                linkedIn: userData['linkedIn'] ?? '',
                               );
                             }
                             return const Center(
