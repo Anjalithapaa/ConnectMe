@@ -43,6 +43,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               photoUrl: decodedData['photoUrl'],
               organization: decodedData['organization'],
               title: decodedData['title'],
+              linkedIn: decodedData['linkedIn'],
             ),
           ),
         );
