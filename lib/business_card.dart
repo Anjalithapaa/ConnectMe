@@ -5,12 +5,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'qrcode.dart';
 import 'main.dart';
+import 'form_page.dart';
 
 class BusinessCard extends StatelessWidget {
   final String name;
   final String email;
   final String phone;
-  final String linkedIn; 
+  final String linkedIn;
   final String photoUrl;
   final String organization;
   final String title;
@@ -88,7 +89,8 @@ class BusinessCard extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.person, color: Colors.black, size: 24),
+                            const Icon(Icons.person,
+                                color: Colors.black, size: 24),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -149,11 +151,14 @@ class BusinessCard extends StatelessWidget {
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      const Icon(Icons.corporate_fare, color: Colors.black, size: 24),
+                      const Icon(Icons.corporate_fare,
+                          color: Colors.black, size: 24),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          organization.isNotEmpty ? organization : 'Your Organization',
+                          organization.isNotEmpty
+                              ? organization
+                              : 'Your Organization',
                           style: const TextStyle(
                             color: Colors.black,
                             fontSize: 18,
@@ -183,7 +188,8 @@ class BusinessCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton(
-                        icon: const Icon(FontAwesomeIcons.linkedin, color: Colors.blue, size: 30),
+                        icon: const Icon(FontAwesomeIcons.linkedin,
+                            color: Colors.blue, size: 30),
                         onPressed: () => _launchUrl(linkedIn),
                       ),
                     ],
@@ -195,28 +201,49 @@ class BusinessCard extends StatelessWidget {
                     thickness: 1,
                   ),
                   Center(
-                    child: ElevatedButton(
-                      child: const Text('Share Your Info'),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => QRCodeScreen(
-                              name: name,
-                              email: email,
-                              phone: phone,
-                              linkedIn: linkedIn,
-                              photoUrl: photoUrl,
-                              organization: organization,
-                              title: title,
-                            ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          child: const Text('Share'),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => QRCodeScreen(
+                                  name: name,
+                                  email: email,
+                                  phone: phone,
+                                  linkedIn: linkedIn,
+                                  photoUrl: photoUrl,
+                                  organization: organization,
+                                  title: title,
+                                ),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.red,
+                            elevation: 0,
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.red,
-                        elevation: 0,
-                      ),
+                        ),
+                        const SizedBox(width: 16), // Space between buttons
+                        ElevatedButton(
+                          child: const Text("Edit"),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FormPage(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.red,
+                            elevation: 0,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -242,7 +269,8 @@ class CurvePainter extends CustomPainter {
 
     final path = Path()
       ..moveTo(0, size.height * 0.15)
-      ..quadraticBezierTo(size.width * 0.48, size.height * 0.38, size.width, size.height * 0.25)
+      ..quadraticBezierTo(
+          size.width * 0.48, size.height * 0.38, size.width, size.height * 0.25)
       ..lineTo(size.width, 0)
       ..lineTo(0, 0);
 
