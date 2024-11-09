@@ -1,3 +1,4 @@
+import 'dart:convert'; // Import for Base64 decoding
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,13 +6,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'qrcode.dart';
 import 'main.dart';
+import 'form_page.dart';
 
 class BusinessCard extends StatelessWidget {
   final String name;
   final String email;
   final String phone;
   final String linkedIn;
-  final String photoUrl;
+  final String photoUrl; // This will now handle Base64-encoded image strings.
   final String organization;
   final String title;
 
@@ -77,7 +79,17 @@ class BusinessCard extends StatelessWidget {
                       backgroundColor: Colors.white,
                       child: CircleAvatar(
                         radius: MediaQuery.of(context).size.width * 0.14,
-                        backgroundImage: NetworkImage(photoUrl),
+                        backgroundImage: photoUrl.isNotEmpty
+                            ? MemoryImage(base64Decode(
+                                photoUrl)) // Decode and display Base64 image
+                            : null,
+                        child: photoUrl.isEmpty
+                            ? const Icon(
+                                Icons.person,
+                                size: 60,
+                                color: Colors.grey,
+                              )
+                            : null,
                       ),
                     ),
                   ),
@@ -200,28 +212,49 @@ class BusinessCard extends StatelessWidget {
                     thickness: 1,
                   ),
                   Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => QRCodeScreen(
-                              name: name,
-                              email: email,
-                              phone: phone,
-                              linkedIn: linkedIn,
-                              photoUrl: photoUrl,
-                              organization: organization,
-                              title: title,
-                            ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          child: const Text('Share'),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => QRCodeScreen(
+                                  name: name,
+                                  email: email,
+                                  phone: phone,
+                                  linkedIn: linkedIn,
+                                  photoUrl: photoUrl,
+                                  organization: organization,
+                                  title: title,
+                                ),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.red,
+                            elevation: 0,
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.red,
-                        elevation: 0,
-                      ),
-                      child: const Text('Share Your Info'),
+                        ),
+                        const SizedBox(width: 16), // Space between buttons
+                        ElevatedButton(
+                          child: const Text("Edit"),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FormPage(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.red,
+                            elevation: 0,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

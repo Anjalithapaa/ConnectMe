@@ -40,7 +40,9 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               name: decodedData['name'],
               email: decodedData['email'],
               phone: decodedData['phone'],
-              photoUrl: decodedData['photoUrl'],
+// With a null-aware operator to provide a fallback value:
+              photoUrl: decodedData['photoUrl'] ?? 'default_image_url_here',
+
               organization: decodedData['organization'],
               title: decodedData['title'],
               linkedIn: decodedData['linkedIn'],

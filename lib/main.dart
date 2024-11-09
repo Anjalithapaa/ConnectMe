@@ -60,15 +60,17 @@ class AuthChecker extends StatelessWidget {
                     final userData =
                         snapshot.data!.data() as Map<String, dynamic>;
                     return BusinessCard(
-                        name: userData['name'] ?? '',
-                        email: userData['email'] ?? '',
-                        phone: userData['phone'] ?? '',
-                        photoUrl: userData['photoUrl'] ?? '',
-                        organization: userData['organization'] ?? '',
-                        title: userData['title'] ?? '',
-                        linkedIn: userData['linkedIn'] ?? '');
+                      name: userData['name'] ?? '',
+                      email: userData['email'] ?? '',
+                      phone: userData['phone'] ?? '',
+                      photoUrl: userData['photoBase64'] ??
+                          'default_image_url_here', // Update here
+                      organization: userData['organization'] ?? '',
+                      title: userData['title'] ?? '',
+                      linkedIn: userData['linkedIn'] ?? '',
+                    );
                   } else {
-                    return const FormPage();
+                    return FormPage();
                   }
                 }
                 return const Center(child: CircularProgressIndicator());
