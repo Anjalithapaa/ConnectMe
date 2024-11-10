@@ -3,8 +3,6 @@
 <plist version="1.0">
 <dict>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>This app needs access to the photo gallery to save business cards and QR codes</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>This app needs access to the photo gallery to save QR codes</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
