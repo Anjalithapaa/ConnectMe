@@ -4,7 +4,7 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'business_card.dart';
 
 class QRScannerScreen extends StatefulWidget {
-  const QRScannerScreen({Key? key}) : super(key: key);
+  const QRScannerScreen({super.key});
 
   @override
   _QRScannerScreenState createState() => _QRScannerScreenState();
@@ -30,7 +30,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
 
       if (result != null) {
         // Decode the QR code data
-        var decodedData = jsonDecode(result!.code!);
+        var decodedData = jsonDecode(result!.code);
 
         // Navigate to the BusinessCard page with the decoded data
         Navigator.push(
@@ -40,7 +40,9 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               name: decodedData['name'],
               email: decodedData['email'],
               phone: decodedData['phone'],
-              photoUrl: decodedData['photoUrl'],
+// With a null-aware operator to provide a fallback value:
+              photoUrl: decodedData['photoUrl'] ?? 'default_image_url_here',
+
               organization: decodedData['organization'],
               title: decodedData['title'],
               linkedIn: decodedData['linkedIn'],

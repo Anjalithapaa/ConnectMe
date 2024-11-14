@@ -1,6 +1,9 @@
+import 'dart:convert'; // For Base64 encoding
+import 'dart:typed_data'; // For handling image bytes
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart'; // For image picker
 import 'business_card.dart';
 
 class FormPage extends StatefulWidget {
@@ -17,13 +20,13 @@ class _FormPageState extends State<FormPage> {
   String photoUrl = '';
   String title = '';
   String organization = '';
+  Uint8List? _selectedImageBytes; // Store the uploaded image bytes
 
   // Controllers
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController linkedInController = TextEditingController();
-  final TextEditingController photoUrlController = TextEditingController();
   final TextEditingController titleController = TextEditingController();
   final TextEditingController organizationController = TextEditingController();
 
@@ -50,11 +53,10 @@ class _FormPageState extends State<FormPage> {
             emailController.text = doc['email'] ?? '';
             phoneController.text = doc['phone'] ?? '';
             linkedInController.text = doc['linkedIn'] ?? '';
-            photoUrlController.text = doc['photoUrl'] ?? '';
+            photoUrl = doc['photoUrl'] ?? '';
             titleController.text = doc['title'] ?? '';
             organizationController.text = doc['organization'] ?? '';
           });
-          _showEditInformationDialog();
         } else {
           print("No document found for this user.");
         }
@@ -66,24 +68,19 @@ class _FormPageState extends State<FormPage> {
     }
   }
 
-  void _showEditInformationDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Edit Existing Information'),
-          content: Text('Would you like to review and edit previous data?'),
-          actions: [
-            TextButton(
-              child: Text('Continue to Edit'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile =
+        await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      Uint8List imageBytes = await pickedFile.readAsBytes();
+      setState(() {
+        _selectedImageBytes = imageBytes;
+        photoUrl =
+            base64Encode(imageBytes); // Convert image bytes to Base64 string
+      });
+    }
   }
 
   Future<void> _saveUserData() async {
@@ -96,7 +93,7 @@ class _FormPageState extends State<FormPage> {
         'email': emailController.text,
         'phone': phoneController.text,
         'linkedIn': linkedInController.text,
-        'photoUrl': photoUrlController.text,
+        'photoUrl': photoUrl, // Save Base64 image string
         'title': titleController.text,
         'organization': organizationController.text,
       });
@@ -205,14 +202,23 @@ class _FormPageState extends State<FormPage> {
                   return null;
                 }),
                 const SizedBox(height: 16),
-                _buildTextField(
-                    'Photo URL', 'Enter photo URL', photoUrlController,
-                    (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a photo URL';
-                  }
-                  return null;
-                }),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: _pickImage,
+                      child: const Text('Upload Photo'),
+                    ),
+                    const SizedBox(width: 10),
+                    _selectedImageBytes != null
+                        ? Image.memory(
+                            _selectedImageBytes!,
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          )
+                        : const Text('No image selected'),
+                  ],
+                ),
                 const SizedBox(height: 16),
                 _buildTextField('Organization', 'Enter your organization',
                     organizationController, (value) {
@@ -241,7 +247,7 @@ class _FormPageState extends State<FormPage> {
                             name: nameController.text,
                             email: emailController.text,
                             phone: phoneController.text,
-                            photoUrl: photoUrlController.text,
+                            photoUrl: photoUrl, // Pass the Base64 image string
                             organization: organizationController.text,
                             title: titleController.text,
                             linkedIn: linkedInController.text,

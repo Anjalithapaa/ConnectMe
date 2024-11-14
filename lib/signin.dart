@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'signup.dart';
-import 'business_card.dart';
 import 'main.dart';
 
 class SignInPage extends StatefulWidget {
@@ -14,6 +14,24 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  String photoUrl = ''; // Add this to store the photo URL
+
+  Future<void> _loadUserData() async {
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          photoUrl = userDoc.data()?['photoUrl'] ?? '';
+        });
+      }
+    } catch (e) {
+      print("Error loading user data: $e");
+    }
+  }
 
   Future<void> _signIn() async {
     try {
@@ -21,6 +39,9 @@ class _SignInPageState extends State<SignInPage> {
         email: _emailController.text,
         password: _passwordController.text,
       );
+      // Load user data after successful sign-in
+      await _loadUserData();
+
       // Navigate to AuthChecker to verify user data
       Navigator.pushReplacement(
         context,
