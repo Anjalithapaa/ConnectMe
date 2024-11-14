@@ -56,7 +56,7 @@ class _SignUpPageState extends State<SignUpPage> {
         // Navigate to FormPage
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => FormPage()),
+          MaterialPageRoute(builder: (context) => const FormPage()),
         );
       }
     } catch (e) {
