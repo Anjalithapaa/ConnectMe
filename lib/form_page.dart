@@ -1,14 +1,12 @@
-import 'dart:convert'; // Import for Base64 encoding
+import 'dart:convert'; // For Base64 encoding
+import 'dart:typed_data'; // For handling image bytes
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:image_picker/image_picker.dart'; // Import for image picker
-import 'dart:typed_data'; // For handling image bytes
+import 'package:image_picker/image_picker.dart'; // For image picker
 import 'business_card.dart';
 
 class FormPage extends StatefulWidget {
-  const FormPage({super.key});
-
   @override
   _FormPageState createState() => _FormPageState();
 }
@@ -59,7 +57,6 @@ class _FormPageState extends State<FormPage> {
             titleController.text = doc['title'] ?? '';
             organizationController.text = doc['organization'] ?? '';
           });
-          _showEditInformationDialog();
         } else {
           print("No document found for this user.");
         }
@@ -69,27 +66,6 @@ class _FormPageState extends State<FormPage> {
     } else {
       print("No authenticated user found.");
     }
-  }
-
-  void _showEditInformationDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Edit Existing Information'),
-          content:
-              const Text('Would you like to review and edit previous data?'),
-          actions: [
-            TextButton(
-              child: const Text('Continue to Edit'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   Future<void> _pickImage() async {
@@ -280,6 +256,10 @@ class _FormPageState extends State<FormPage> {
                       );
                     }
                   },
+                  child: const Text(
+                    'Create ICard',
+                    style: TextStyle(fontSize: 18),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 3, 101, 146),
                     foregroundColor: Colors.white,
@@ -289,10 +269,6 @@ class _FormPageState extends State<FormPage> {
                     padding: const EdgeInsets.symmetric(
                         vertical: 12, horizontal: 20),
                     elevation: 5,
-                  ),
-                  child: const Text(
-                    'Create ICard',
-                    style: TextStyle(fontSize: 18),
                   ),
                 ),
               ],

@@ -1,11 +1,12 @@
 import 'dart:convert'; // Import for Base64 decoding
+import 'dart:typed_data';
+import 'package:connect_me/main.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'qrcode.dart';
-import 'main.dart';
 import 'form_page.dart';
 
 class BusinessCard extends StatelessWidget {
@@ -27,6 +28,23 @@ class BusinessCard extends StatelessWidget {
     required this.title,
     required this.linkedIn,
   });
+  // Helper function to decode Base64 string
+  ImageProvider? _getImageFromBase64(String base64String) {
+    try {
+      // Ensure the Base64 string is properly padded
+      String formattedBase64 = base64String;
+      while (formattedBase64.length % 4 != 0) {
+        formattedBase64 += '=';
+      }
+
+      // Decode the Base64 string
+      Uint8List imageBytes = base64Decode(formattedBase64);
+      return MemoryImage(imageBytes);
+    } catch (e) {
+      print('Error decoding Base64 image: $e');
+      return null; // Return null if the image decoding fails
+    }
+  }
 
   Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);
@@ -80,8 +98,8 @@ class BusinessCard extends StatelessWidget {
                       child: CircleAvatar(
                         radius: MediaQuery.of(context).size.width * 0.14,
                         backgroundImage: photoUrl.isNotEmpty
-                            ? MemoryImage(base64Decode(
-                                photoUrl)) // Decode and display Base64 image
+                            ? _getImageFromBase64(
+                                photoUrl) // Updated to use the helper function
                             : null,
                         child: photoUrl.isEmpty
                             ? const Icon(
@@ -225,7 +243,7 @@ class BusinessCard extends StatelessWidget {
                                   email: email,
                                   phone: phone,
                                   linkedIn: linkedIn,
-                                  /* photoUrl: photoUrl,*/
+                                  photoUrl: photoUrl,
                                   organization: organization,
                                   title: title,
                                 ),

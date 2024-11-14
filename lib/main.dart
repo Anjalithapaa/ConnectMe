@@ -70,7 +70,7 @@ class AuthChecker extends StatelessWidget {
                       linkedIn: userData['linkedIn'] ?? '',
                     );
                   } else {
-                    return const FormPage();
+                    return FormPage();
                   }
                 }
                 return const Center(child: CircularProgressIndicator());

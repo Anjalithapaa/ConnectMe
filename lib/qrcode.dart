@@ -19,6 +19,7 @@ class QRCodeScreen extends StatelessWidget {
     required this.organization,
     required this.title,
     required this.linkedIn,
+    required String photoUrl,
   });
 
   @override
