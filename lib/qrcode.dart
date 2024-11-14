@@ -6,7 +6,7 @@ class QRCodeScreen extends StatelessWidget {
   final String email;
   final String phone;
   final String linkedIn;
-  final String photoUrl;
+  /*final String photoUrl; */
   final String organization;
   final String title;
 
@@ -15,7 +15,7 @@ class QRCodeScreen extends StatelessWidget {
     required this.name,
     required this.email,
     required this.phone,
-    required this.photoUrl,
+    /* required this.photoUrl,*/
     required this.organization,
     required this.title,
     required this.linkedIn,
@@ -29,7 +29,7 @@ class QRCodeScreen extends StatelessWidget {
         "&email=${Uri.encodeComponent(email)}"
         "&phone=${Uri.encodeComponent(phone)}"
         "&linkedIn=${Uri.encodeComponent(linkedIn)}"
-        "&photoUrl=${Uri.encodeComponent(photoUrl)}"
+        /*  "&photoUrl=${Uri.encodeComponent(photoUrl)}" */
         "&organization=${Uri.encodeComponent(organization)}"
         "&title=${Uri.encodeComponent(title)}";
 

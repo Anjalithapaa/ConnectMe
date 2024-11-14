@@ -7,6 +7,8 @@ import 'dart:typed_data'; // For handling image bytes
 import 'business_card.dart';
 
 class FormPage extends StatefulWidget {
+  const FormPage({super.key});
+
   @override
   _FormPageState createState() => _FormPageState();
 }
@@ -74,11 +76,12 @@ class _FormPageState extends State<FormPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Edit Existing Information'),
-          content: Text('Would you like to review and edit previous data?'),
+          title: const Text('Edit Existing Information'),
+          content:
+              const Text('Would you like to review and edit previous data?'),
           actions: [
             TextButton(
-              child: Text('Continue to Edit'),
+              child: const Text('Continue to Edit'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -277,10 +280,6 @@ class _FormPageState extends State<FormPage> {
                       );
                     }
                   },
-                  child: const Text(
-                    'Create ICard',
-                    style: TextStyle(fontSize: 18),
-                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 3, 101, 146),
                     foregroundColor: Colors.white,
@@ -290,6 +289,10 @@ class _FormPageState extends State<FormPage> {
                     padding: const EdgeInsets.symmetric(
                         vertical: 12, horizontal: 20),
                     elevation: 5,
+                  ),
+                  child: const Text(
+                    'Create ICard',
+                    style: TextStyle(fontSize: 18),
                   ),
                 ),
               ],

@@ -216,7 +216,6 @@ class BusinessCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ElevatedButton(
-                          child: const Text('Share'),
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -226,7 +225,7 @@ class BusinessCard extends StatelessWidget {
                                   email: email,
                                   phone: phone,
                                   linkedIn: linkedIn,
-                                  photoUrl: photoUrl,
+                                  /* photoUrl: photoUrl,*/
                                   organization: organization,
                                   title: title,
                                 ),
@@ -237,10 +236,10 @@ class BusinessCard extends StatelessWidget {
                             foregroundColor: Colors.red,
                             elevation: 0,
                           ),
+                          child: const Text('Share'),
                         ),
                         const SizedBox(width: 16), // Space between buttons
                         ElevatedButton(
-                          child: const Text("Edit"),
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -253,6 +252,7 @@ class BusinessCard extends StatelessWidget {
                             foregroundColor: Colors.red,
                             elevation: 0,
                           ),
+                          child: const Text("Edit"),
                         ),
                       ],
                     ),
