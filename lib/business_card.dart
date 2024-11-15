@@ -14,7 +14,7 @@ class BusinessCard extends StatelessWidget {
   final String email;
   final String phone;
   final String linkedIn;
-  final String photoUrl; // This will now handle Base64-encoded image strings.
+  final String photoUrl;
   final String organization;
   final String title;
 
@@ -28,21 +28,16 @@ class BusinessCard extends StatelessWidget {
     required this.title,
     required this.linkedIn,
   });
-  // Helper function to decode Base64 string
   ImageProvider? _getImageFromBase64(String base64String) {
     try {
-      // Ensure the Base64 string is properly padded
       String formattedBase64 = base64String;
       while (formattedBase64.length % 4 != 0) {
         formattedBase64 += '=';
       }
-
-      // Decode the Base64 string
-      Uint8List imageBytes = base64Decode(formattedBase64);
-      return MemoryImage(imageBytes);
+      return MemoryImage(base64Decode(formattedBase64));
     } catch (e) {
       print('Error decoding Base64 image: $e');
-      return null; // Return null if the image decoding fails
+      return null;
     }
   }
 
@@ -98,15 +93,10 @@ class BusinessCard extends StatelessWidget {
                       child: CircleAvatar(
                         radius: MediaQuery.of(context).size.width * 0.14,
                         backgroundImage: photoUrl.isNotEmpty
-                            ? _getImageFromBase64(
-                                photoUrl) // Updated to use the helper function
+                            ? _getImageFromBase64(photoUrl)
                             : null,
                         child: photoUrl.isEmpty
-                            ? const Icon(
-                                Icons.person,
-                                size: 60,
-                                color: Colors.grey,
-                              )
+                            ? const Icon(Icons.person, size: 50)
                             : null,
                       ),
                     ),

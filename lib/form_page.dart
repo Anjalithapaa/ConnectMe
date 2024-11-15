@@ -53,7 +53,16 @@ class _FormPageState extends State<FormPage> {
             emailController.text = doc['email'] ?? '';
             phoneController.text = doc['phone'] ?? '';
             linkedInController.text = doc['linkedIn'] ?? '';
-            photoUrl = doc['photoUrl'] ?? '';
+            try {
+              photoUrl = doc['photoUrl'] ?? '';
+              if (photoUrl.isNotEmpty) {
+                _selectedImageBytes = base64Decode(photoUrl);
+              }
+            } catch (e) {
+              print('Error loading photo: $e');
+              photoUrl = '';
+              _selectedImageBytes = null;
+            }
             titleController.text = doc['title'] ?? '';
             organizationController.text = doc['organization'] ?? '';
           });
@@ -69,17 +78,28 @@ class _FormPageState extends State<FormPage> {
   }
 
   Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? pickedFile =
-        await picker.pickImage(source: ImageSource.gallery);
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? pickedFile = await picker.pickImage(
+          source: ImageSource.gallery,
+          maxWidth: 512,
+          maxHeight: 512,
+          imageQuality: 50);
 
-    if (pickedFile != null) {
-      Uint8List imageBytes = await pickedFile.readAsBytes();
-      setState(() {
-        _selectedImageBytes = imageBytes;
-        photoUrl =
-            base64Encode(imageBytes); // Convert image bytes to Base64 string
-      });
+      if (pickedFile != null) {
+        Uint8List imageBytes = await pickedFile.readAsBytes();
+        setState(() {
+          _selectedImageBytes = imageBytes;
+          String base64String = base64Encode(imageBytes);
+          // Ensure proper padding
+          while (base64String.length % 4 != 0) {
+            base64String += '=';
+          }
+          photoUrl = base64String;
+        });
+      }
+    } catch (e) {
+      print('Error picking image: $e');
     }
   }
 
@@ -87,16 +107,30 @@ class _FormPageState extends State<FormPage> {
     User? user = _auth.currentUser;
 
     if (user != null) {
-      // Save user data to Firestore
-      await _firestore.collection('users').doc(user.uid).set({
-        'name': nameController.text,
-        'email': emailController.text,
-        'phone': phoneController.text,
-        'linkedIn': linkedInController.text,
-        'photoUrl': photoUrl, // Save Base64 image string
-        'title': titleController.text,
-        'organization': organizationController.text,
-      });
+      try {
+        // Validate photoUrl before saving
+        String validPhotoUrl = photoUrl;
+        if (photoUrl.isNotEmpty) {
+          try {
+            base64Decode(photoUrl); // Test if valid Base64
+          } catch (e) {
+            validPhotoUrl = ''; // Reset if invalid
+            print('Invalid Base64 string: $e');
+          }
+        }
+
+        await _firestore.collection('users').doc(user.uid).set({
+          'name': nameController.text,
+          'email': emailController.text,
+          'phone': phoneController.text,
+          'linkedIn': linkedInController.text,
+          'photoUrl': validPhotoUrl,
+          'title': titleController.text,
+          'organization': organizationController.text,
+        });
+      } catch (e) {
+        print('Error saving user data: $e');
+      }
     }
   }
 

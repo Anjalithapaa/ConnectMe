@@ -30,7 +30,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
 
       if (result != null) {
         // Decode the QR code data
-        var decodedData = jsonDecode(result!.code);
+        var decodedData = jsonDecode(result!.code!);
 
         // Navigate to the BusinessCard page with the decoded data
         Navigator.push(
