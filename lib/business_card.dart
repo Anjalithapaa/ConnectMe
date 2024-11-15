@@ -8,6 +8,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'qrcode.dart';
 import 'form_page.dart';
+import 'dart:typed_data';
+import 'dart:convert';  // For base64Decode
 
 class BusinessCard extends StatelessWidget {
   final String name;
@@ -97,17 +99,9 @@ class BusinessCard extends StatelessWidget {
                       backgroundColor: Colors.white,
                       child: CircleAvatar(
                         radius: MediaQuery.of(context).size.width * 0.14,
-                        backgroundImage: photoUrl.isNotEmpty
-                            ? _getImageFromBase64(
-                                photoUrl) // Updated to use the helper function
-                            : null,
-                        child: photoUrl.isEmpty
-                            ? const Icon(
-                                Icons.person,
-                                size: 60,
-                                color: Colors.grey,
-                              )
-                            : null,
+
+                        backgroundImage: MemoryImage(base64Decode(photoUrl)),
+
                       ),
                     ),
                   ),

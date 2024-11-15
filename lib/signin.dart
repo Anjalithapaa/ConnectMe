@@ -33,6 +33,7 @@ class _SignInPageState extends State<SignInPage> {
     }
   }
 
+
   Future<void> _signIn() async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
