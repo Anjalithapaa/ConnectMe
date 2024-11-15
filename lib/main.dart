@@ -256,10 +256,12 @@ class _HomePageState extends State<HomePage>
 
 class AuthenticatedHomePage extends StatelessWidget {
   final String userName;
+  final String photoUrl;
 
   const AuthenticatedHomePage({
     super.key,
     required this.userName,
+    this.photoUrl = '',
   });
 
   @override

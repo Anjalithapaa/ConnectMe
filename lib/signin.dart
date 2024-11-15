@@ -22,7 +22,6 @@ class _SignInPageState extends State<SignInPage> {
           .collection('users')
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .get();
-
       if (userDoc.exists) {
         setState(() {
           photoUrl = userDoc.data()?['photoUrl'] ?? '';
@@ -35,21 +34,53 @@ class _SignInPageState extends State<SignInPage> {
 
   Future<void> _signIn() async {
     try {
+      // Sign in
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
-      // Load user data after successful sign-in
-      await _loadUserData();
 
-      // Navigate to AuthChecker to verify user data
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const AuthChecker()),
-      );
+      // Load user data
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get();
+
+      if (userDoc.exists) {
+        String userName = userDoc.data()?['name'] ?? 'User';
+        String photoUrl = userDoc.data()?['photoUrl'] ?? '';
+
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AuthenticatedHomePage(
+                userName: userName,
+                photoUrl: photoUrl, // Pass the photoUrl
+              ),
+            ),
+          );
+        }
+      } else {
+        // Handle case where user document doesn't exist
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AuthChecker(),
+            ),
+          );
+        }
+      }
     } catch (e) {
       print("Sign-in error: $e");
-      // You could also show an error message to the user here
+      // Show error message to user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error signing in: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
