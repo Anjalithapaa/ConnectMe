@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:gallery_saver/gallery_saver.dart';
+import 'dart:convert';
 
 class QRCodeScreen extends StatefulWidget {
   final String name;
@@ -195,7 +196,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
         "&email=${Uri.encodeComponent(widget.email)}"
         "&phone=${Uri.encodeComponent(widget.phone)}"
         "&linkedIn=${Uri.encodeComponent(widget.linkedIn)}"
-        "&photoUrl=${Uri.encodeComponent(widget.photoUrl)}"
+        // "&photoUrl=${Uri.encodeComponent(widget.photoUrl)}"
         "&organization=${Uri.encodeComponent(widget.organization)}"
         "&title=${Uri.encodeComponent(widget.title)}";
 
@@ -268,10 +269,15 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      // In QRCodeScreen.dart, modify the CircleAvatar:
                       CircleAvatar(
                         radius: 50,
-                        backgroundImage: NetworkImage(widget.photoUrl),
-                        onBackgroundImageError: (e, s) {},
+                        backgroundImage: widget.photoUrl.isNotEmpty
+                            ? MemoryImage(base64Decode(widget.photoUrl))
+                            : null,
+                        onBackgroundImageError: (e, s) {
+                          print('Error loading image: $e');
+                        },
                         child: widget.photoUrl.isEmpty
                             ? const Icon(Icons.person, size: 50)
                             : null,

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'business_card.dart';
+import 'dart:convert'; // For Base64 encoding
+import 'dart:typed_data'; // For handling image bytes
+import 'package:image_picker/image_picker.dart'; // For image picker
 
 class FormPage extends StatefulWidget {
   @override
@@ -17,6 +20,7 @@ class _FormPageState extends State<FormPage> {
   String photoUrl = '';
   String title = '';
   String organization = '';
+  Uint8List? _selectedImageBytes; // Store the uploaded image bytes
 
   // Controllers
   final TextEditingController nameController = TextEditingController();
@@ -86,6 +90,25 @@ class _FormPageState extends State<FormPage> {
     );
   }
 
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 512, // Limit image width
+        maxHeight: 512, // Limit image height
+        imageQuality: 50 // Compress quality (0-100)
+        );
+
+    if (pickedFile != null) {
+      Uint8List imageBytes = await pickedFile.readAsBytes();
+      setState(() {
+        _selectedImageBytes = imageBytes;
+        photoUrl = base64Encode(imageBytes);
+        photoUrlController.text = photoUrl;
+      });
+    }
+  }
+
   Future<void> _saveUserData() async {
     User? user = _auth.currentUser;
 
@@ -96,7 +119,7 @@ class _FormPageState extends State<FormPage> {
         'email': emailController.text,
         'phone': phoneController.text,
         'linkedIn': linkedInController.text,
-        'photoUrl': photoUrlController.text,
+        'photoUrl': photoUrl,
         'title': titleController.text,
         'organization': organizationController.text,
       });
@@ -205,14 +228,23 @@ class _FormPageState extends State<FormPage> {
                   return null;
                 }),
                 const SizedBox(height: 16),
-                _buildTextField(
-                    'Photo URL', 'Enter photo URL', photoUrlController,
-                    (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a photo URL';
-                  }
-                  return null;
-                }),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: _pickImage,
+                      child: const Text('Upload Photo'),
+                    ),
+                    const SizedBox(width: 10),
+                    _selectedImageBytes != null
+                        ? Image.memory(
+                            _selectedImageBytes!,
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          )
+                        : const Text('No image selected'),
+                  ],
+                ),
                 const SizedBox(height: 16),
                 _buildTextField('Organization', 'Enter your organization',
                     organizationController, (value) {

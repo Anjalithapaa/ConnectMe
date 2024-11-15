@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'qrcode.dart';
 import 'main.dart';
 import 'form_page.dart';
+import 'dart:typed_data';
+import 'dart:convert';  // For base64Decode
 
 class BusinessCard extends StatelessWidget {
   final String name;
@@ -78,7 +80,7 @@ class BusinessCard extends StatelessWidget {
                       backgroundColor: Colors.white,
                       child: CircleAvatar(
                         radius: MediaQuery.of(context).size.width * 0.14,
-                        backgroundImage: NetworkImage(photoUrl),
+                        backgroundImage: MemoryImage(base64Decode(photoUrl)),
                       ),
                     ),
                   ),
