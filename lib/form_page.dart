@@ -1,6 +1,9 @@
+import 'dart:convert'; // For Base64 encoding
+import 'dart:typed_data'; // For handling image bytes
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart'; // For image picker
 import 'business_card.dart';
 import 'dart:convert'; // For Base64 encoding
 import 'dart:typed_data'; // For handling image bytes
@@ -27,7 +30,6 @@ class _FormPageState extends State<FormPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController linkedInController = TextEditingController();
-  final TextEditingController photoUrlController = TextEditingController();
   final TextEditingController titleController = TextEditingController();
   final TextEditingController organizationController = TextEditingController();
 
@@ -54,11 +56,10 @@ class _FormPageState extends State<FormPage> {
             emailController.text = doc['email'] ?? '';
             phoneController.text = doc['phone'] ?? '';
             linkedInController.text = doc['linkedIn'] ?? '';
-            photoUrlController.text = doc['photoUrl'] ?? '';
+            photoUrl = doc['photoUrl'] ?? '';
             titleController.text = doc['title'] ?? '';
             organizationController.text = doc['organization'] ?? '';
           });
-          _showEditInformationDialog();
         } else {
           print("No document found for this user.");
         }
@@ -70,24 +71,19 @@ class _FormPageState extends State<FormPage> {
     }
   }
 
-  void _showEditInformationDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Edit Existing Information'),
-          content: Text('Would you like to review and edit previous data?'),
-          actions: [
-            TextButton(
-              child: Text('Continue to Edit'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile =
+        await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      Uint8List imageBytes = await pickedFile.readAsBytes();
+      setState(() {
+        _selectedImageBytes = imageBytes;
+        photoUrl =
+            base64Encode(imageBytes); // Convert image bytes to Base64 string
+      });
+    }
   }
 
   Future<void> _pickImage() async {
@@ -119,7 +115,7 @@ class _FormPageState extends State<FormPage> {
         'email': emailController.text,
         'phone': phoneController.text,
         'linkedIn': linkedInController.text,
-        'photoUrl': photoUrl,
+        'photoUrl': photoUrl, // Save Base64 image string
         'title': titleController.text,
         'organization': organizationController.text,
       });
@@ -273,7 +269,7 @@ class _FormPageState extends State<FormPage> {
                             name: nameController.text,
                             email: emailController.text,
                             phone: phoneController.text,
-                            photoUrl: photoUrlController.text,
+                            photoUrl: photoUrl, // Pass the Base64 image string
                             organization: organizationController.text,
                             title: titleController.text,
                             linkedIn: linkedInController.text,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'signup.dart';
-import 'business_card.dart';
 import 'main.dart';
 
 class SignInPage extends StatefulWidget {
@@ -23,6 +22,7 @@ class _SignInPageState extends State<SignInPage> {
           .collection('users')
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .get();
+
       if (userDoc.exists) {
         setState(() {
           photoUrl = userDoc.data()?['photoUrl'] ?? '';
@@ -42,6 +42,7 @@ class _SignInPageState extends State<SignInPage> {
       );
       // Load user data after successful sign-in
       await _loadUserData();
+
       // Navigate to AuthChecker to verify user data
       Navigator.pushReplacement(
         context,
