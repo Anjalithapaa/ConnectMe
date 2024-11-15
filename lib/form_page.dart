@@ -5,9 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart'; // For image picker
 import 'business_card.dart';
-import 'dart:convert'; // For Base64 encoding
-import 'dart:typed_data'; // For handling image bytes
-import 'package:image_picker/image_picker.dart'; // For image picker
 
 class FormPage extends StatefulWidget {
   @override
@@ -82,25 +79,6 @@ class _FormPageState extends State<FormPage> {
         _selectedImageBytes = imageBytes;
         photoUrl =
             base64Encode(imageBytes); // Convert image bytes to Base64 string
-      });
-    }
-  }
-
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 512, // Limit image width
-        maxHeight: 512, // Limit image height
-        imageQuality: 50 // Compress quality (0-100)
-        );
-
-    if (pickedFile != null) {
-      Uint8List imageBytes = await pickedFile.readAsBytes();
-      setState(() {
-        _selectedImageBytes = imageBytes;
-        photoUrl = base64Encode(imageBytes);
-        photoUrlController.text = photoUrl;
       });
     }
   }
