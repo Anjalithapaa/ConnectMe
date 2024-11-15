@@ -63,10 +63,11 @@ class AuthChecker extends StatelessWidget {
                       name: userData['name'] ?? '',
                       email: userData['email'] ?? '',
                       phone: userData['phone'] ?? '',
-                      photoUrl: userData['photoUrl'] ?? '',
+                      photoUrl: userData['photoBase64'] ??
+                          'default_image_url_here', // Update here
                       organization: userData['organization'] ?? '',
                       title: userData['title'] ?? '',
-                      linkedIn:userData['linkedIn']?? ''
+                      linkedIn: userData['linkedIn'] ?? '',
                     );
                   } else {
                     return FormPage();
@@ -255,10 +256,12 @@ class _HomePageState extends State<HomePage>
 
 class AuthenticatedHomePage extends StatelessWidget {
   final String userName;
+  final String photoUrl;
 
   const AuthenticatedHomePage({
     super.key,
     required this.userName,
+    this.photoUrl = '',
   });
 
   @override
@@ -323,7 +326,7 @@ class AuthenticatedHomePage extends StatelessWidget {
                                 photoUrl: userData['photoUrl'] ?? '',
                                 organization: userData['organization'] ?? '',
                                 title: userData['title'] ?? '',
-                                linkedIn: userData ['linkedIn'] ?? '',
+                                linkedIn: userData['linkedIn'] ?? '',
                               );
                             }
                             return const Center(

@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:gallery_saver/gallery_saver.dart';
+import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 
 
@@ -40,6 +41,20 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
   final GlobalKey _cardKey = GlobalKey();
   bool _isSaving = false;
   bool _isDownloading = false;
+  ImageProvider? _getImageFromBase64(String base64String) {
+    try {
+      if (base64String == 'default_image_url_here') return null;
+
+      String formattedBase64 = base64String;
+      while (formattedBase64.length % 4 != 0) {
+        formattedBase64 += '=';
+      }
+      return MemoryImage(base64Decode(formattedBase64));
+    } catch (e) {
+      print('Error decoding Base64 image: $e');
+      return null;
+    }
+  }
    
    Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);
@@ -208,7 +223,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
         "&email=${Uri.encodeComponent(widget.email)}"
         "&phone=${Uri.encodeComponent(widget.phone)}"
         "&linkedIn=${Uri.encodeComponent(widget.linkedIn)}"
-        "&photoUrl=${Uri.encodeComponent(widget.photoUrl)}"
+        // "&photoUrl=${Uri.encodeComponent(widget.photoUrl)}"
         "&organization=${Uri.encodeComponent(widget.organization)}"
         "&title=${Uri.encodeComponent(widget.title)}";
 
@@ -283,9 +298,11 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                     children: [
                       CircleAvatar(
                         radius: 50,
-                        backgroundImage: NetworkImage(widget.photoUrl),
-                        onBackgroundImageError: (e, s) {},
-                        child: widget.photoUrl.isEmpty
+                        backgroundImage: widget.photoUrl.isNotEmpty
+                            ? _getImageFromBase64(widget.photoUrl)
+                            : null,
+                        child: (widget.photoUrl.isEmpty ||
+                                _getImageFromBase64(widget.photoUrl) == null)
                             ? const Icon(Icons.person, size: 50)
                             : null,
                       ),
@@ -326,9 +343,11 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                       ListTile(
                         leading: const Icon(Icons.phone,
                             color: Color.fromARGB(255, 3, 101, 146)),
+                            
                         title: Text(widget.phone),
+
                         dense: true,
-                         onTap: () => _launchUrl('tel:${widget.phone}'), //Phone Hyperlink
+                         onTap: () => _launchUrl('tel:${widget.phone}' ), //Phone Hyperlink
                       ),
                       ListTile(
                         leading: const Icon(Icons.link,

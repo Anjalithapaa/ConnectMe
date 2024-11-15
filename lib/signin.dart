@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'signup.dart';
-import 'business_card.dart';
 import 'main.dart';
 
 class SignInPage extends StatefulWidget {
@@ -14,21 +14,73 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  String photoUrl = ''; // Add this to store the photo URL
+
+  Future<void> _loadUserData() async {
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get();
+      if (userDoc.exists) {
+        setState(() {
+          photoUrl = userDoc.data()?['photoUrl'] ?? '';
+        });
+      }
+    } catch (e) {
+      print("Error loading user data: $e");
+    }
+  }
 
   Future<void> _signIn() async {
     try {
+      // Sign in
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
-      // Navigate to AuthChecker to verify user data
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const AuthChecker()),
-      );
+
+      // Load user data
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .get();
+
+      if (userDoc.exists) {
+        String userName = userDoc.data()?['name'] ?? 'User';
+        String photoUrl = userDoc.data()?['photoUrl'] ?? '';
+
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AuthenticatedHomePage(
+                userName: userName,
+                photoUrl: photoUrl, // Pass the photoUrl
+              ),
+            ),
+          );
+        }
+      } else {
+        // Handle case where user document doesn't exist
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AuthChecker(),
+            ),
+          );
+        }
+      }
     } catch (e) {
       print("Sign-in error: $e");
-      // You could also show an error message to the user here
+      // Show error message to user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error signing in: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 

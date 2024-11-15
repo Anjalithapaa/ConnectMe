@@ -1,10 +1,12 @@
+import 'dart:convert'; // Import for Base64 decoding
+import 'dart:typed_data';
+import 'package:connect_me/main.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'qrcode.dart';
-import 'main.dart';
 import 'form_page.dart';
 
 class BusinessCard extends StatelessWidget {
@@ -26,6 +28,18 @@ class BusinessCard extends StatelessWidget {
     required this.title,
     required this.linkedIn,
   });
+  ImageProvider? _getImageFromBase64(String base64String) {
+    try {
+      String formattedBase64 = base64String;
+      while (formattedBase64.length % 4 != 0) {
+        formattedBase64 += '=';
+      }
+      return MemoryImage(base64Decode(formattedBase64));
+    } catch (e) {
+      print('Error decoding Base64 image: $e');
+      return null;
+    }
+  }
 
   Future<void> _launchUrl(String url) async {
     final uri = Uri.parse(url);
@@ -78,7 +92,12 @@ class BusinessCard extends StatelessWidget {
                       backgroundColor: Colors.white,
                       child: CircleAvatar(
                         radius: MediaQuery.of(context).size.width * 0.14,
-                        backgroundImage: NetworkImage(photoUrl),
+                        backgroundImage: photoUrl.isNotEmpty
+                            ? _getImageFromBase64(photoUrl)
+                            : null,
+                        child: photoUrl.isEmpty
+                            ? const Icon(Icons.person, size: 50)
+                            : null,
                       ),
                     ),
                   ),
@@ -205,7 +224,6 @@ class BusinessCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ElevatedButton(
-                          child: const Text('Share'),
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -226,10 +244,10 @@ class BusinessCard extends StatelessWidget {
                             foregroundColor: Colors.red,
                             elevation: 0,
                           ),
+                          child: const Text('Share'),
                         ),
                         const SizedBox(width: 16), // Space between buttons
                         ElevatedButton(
-                          child: const Text("Edit"),
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -242,6 +260,7 @@ class BusinessCard extends StatelessWidget {
                             foregroundColor: Colors.red,
                             elevation: 0,
                           ),
+                          child: const Text("Edit"),
                         ),
                       ],
                     ),
