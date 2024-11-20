@@ -9,7 +9,6 @@ import 'package:gallery_saver/gallery_saver.dart';
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 
-
 class QRCodeScreen extends StatefulWidget {
   final String name;
   final String email;
@@ -29,8 +28,6 @@ class QRCodeScreen extends StatefulWidget {
     required this.title,
     required this.linkedIn,
   }) : super(key: key);
-  
- 
 
   @override
   State<QRCodeScreen> createState() => _QRCodeScreenState();
@@ -55,13 +52,35 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
       return null;
     }
   }
-   
-   Future<void> _launchUrl(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      throw 'Could not launch $url';
+
+  Future<void> _launchUrl(String url) async {
+    try {
+      if (url.startsWith('mailto:')) {
+        // For email
+        String emailUrl = url;
+        await launchUrl(Uri.parse(emailUrl));
+      } else if (url.startsWith('tel:')) {
+        // For phone
+        String phoneUrl = url;
+        await launchUrl(Uri.parse(phoneUrl));
+      } else {
+        // For LinkedIn
+        String webUrl = url;
+        if (!webUrl.startsWith('http://') && !webUrl.startsWith('https://')) {
+          webUrl = 'https://$webUrl';
+        }
+        await launchUrl(Uri.parse(webUrl),
+            mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not launch: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -338,23 +357,27 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                             color: Color.fromARGB(255, 3, 101, 146)),
                         title: Text(widget.email),
                         dense: true,
-                         onTap: () => _launchUrl('mailto:${widget.email}'), // E-mail hyperlink
+                        onTap: () async {
+                          await _launchUrl('mailto:${widget.email}');
+                        },
                       ),
                       ListTile(
                         leading: const Icon(Icons.phone,
                             color: Color.fromARGB(255, 3, 101, 146)),
-                            
                         title: Text(widget.phone),
-
                         dense: true,
-                         onTap: () => _launchUrl('tel:${widget.phone}' ), //Phone Hyperlink
+                        onTap: () async {
+                          await _launchUrl('tel:${widget.phone}');
+                        },
                       ),
                       ListTile(
                         leading: const Icon(Icons.link,
                             color: Color.fromARGB(255, 3, 101, 146)),
                         title: Text(widget.linkedIn),
                         dense: true,
-                        onTap: () => _launchUrl(widget.linkedIn), // LinkedIn hyperlink
+                        onTap: () async {
+                          await _launchUrl(widget.linkedIn);
+                        },
                       ),
                     ],
                   ),

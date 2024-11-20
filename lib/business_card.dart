@@ -1,4 +1,4 @@
-import 'dart:convert'; // Import for Base64 decoding
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:connect_me/main.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +28,7 @@ class BusinessCard extends StatelessWidget {
     required this.title,
     required this.linkedIn,
   });
+
   ImageProvider? _getImageFromBase64(String base64String) {
     try {
       String formattedBase64 = base64String;
@@ -42,11 +43,21 @@ class BusinessCard extends StatelessWidget {
   }
 
   Future<void> _launchUrl(String url) async {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
+    if (url.startsWith('tel:') || url.startsWith('mailto:')) {
+      final uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      } else {
+        throw 'Could not launch $url';
+      }
     } else {
-      throw 'Could not launch $url';
+      // For LinkedIn or other web URLs
+      final uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        throw 'Could not launch $url';
+      }
     }
   }
 
@@ -125,142 +136,244 @@ class BusinessCard extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 20),
-                      ],
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      const Icon(Icons.email, color: Colors.black, size: 24),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => _launchUrl('mailto:$email'),
-                          child: Text(
-                            email.isNotEmpty ? email : 'Your Email',
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      const Icon(Icons.phone, color: Colors.black, size: 24),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => _launchUrl('tel:$phone'),
-                          child: Text(
-                            phone.isNotEmpty ? phone : 'Your Phone',
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      const Icon(Icons.corporate_fare,
-                          color: Colors.black, size: 24),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          organization.isNotEmpty
-                              ? organization
-                              : 'Your Organization',
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      const Icon(Icons.work, color: Colors.black, size: 24),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          title.isNotEmpty ? title : 'Your Title',
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 25),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: const Icon(FontAwesomeIcons.linkedin,
-                            color: Colors.blue, size: 30),
-                        onPressed: () => _launchUrl(linkedIn),
-                      ),
-                    ],
-                  ),
-                  Divider(
-                    indent: MediaQuery.of(context).size.width * 0.1,
-                    endIndent: MediaQuery.of(context).size.width * 0.1,
-                    color: Colors.grey.shade400,
-                    thickness: 1,
-                  ),
-                  Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => QRCodeScreen(
-                                  name: name,
-                                  email: email,
-                                  phone: phone,
-                                  linkedIn: linkedIn,
-                                  photoUrl: photoUrl,
-                                  organization: organization,
-                                  title: title,
+                        // For Email Row
+                        Row(
+                          children: [
+                            const Icon(Icons.email,
+                                color: Colors.black, size: 24),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () async {
+                                  final Uri emailLaunchUri = Uri(
+                                    scheme: 'mailto',
+                                    path: email,
+                                    queryParameters: {
+                                      'subject': 'Contact from Business Card',
+                                    },
+                                  );
+
+                                  try {
+                                    if (!await launchUrl(emailLaunchUri,
+                                        mode: LaunchMode.externalApplication)) {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                'Could not open email app'),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  } catch (e) {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text('Error: $e'),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                                child: Text(
+                                  email.isNotEmpty ? email : 'Your Email',
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                    decoration: TextDecoration.underline,
+                                  ),
                                 ),
                               ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.red,
-                            elevation: 0,
-                          ),
-                          child: const Text('Share'),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 16), // Space between buttons
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => FormPage(),
+                        const SizedBox(height: 20),
+                        // Phone Row
+                        Row(
+                          children: [
+                            const Icon(Icons.phone,
+                                color: Colors.black, size: 24),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () async {
+                                  final Uri telLaunchUri = Uri(
+                                    scheme: 'tel',
+                                    path: phone,
+                                  );
+
+                                  try {
+                                    if (!await launchUrl(telLaunchUri,
+                                        mode: LaunchMode.externalApplication)) {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                'Could not open phone app'),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  } catch (e) {
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content:
+                                              Text('Error launching phone: $e'),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                                child: Text(
+                                  phone.isNotEmpty ? phone : 'Your Phone',
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
                               ),
-                            );
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        // Organization Row
+                        Row(
+                          children: [
+                            const Icon(Icons.corporate_fare,
+                                color: Colors.black, size: 24),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                organization.isNotEmpty
+                                    ? organization
+                                    : 'Your Organization',
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        // Title Row
+                        Row(
+                          children: [
+                            const Icon(Icons.work,
+                                color: Colors.black, size: 24),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                title.isNotEmpty ? title : 'Your Title',
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 25),
+                        // LinkedIn Button
+                        IconButton(
+                          icon: const Icon(FontAwesomeIcons.linkedin,
+                              color: Colors.blue, size: 30),
+                          onPressed: () async {
+                            Uri linkedInUri;
+                            try {
+                              // Check if the URL starts with http/https
+                              if (!linkedIn.startsWith('http://') &&
+                                  !linkedIn.startsWith('https://')) {
+                                linkedInUri = Uri.parse('https://$linkedIn');
+                              } else {
+                                linkedInUri = Uri.parse(linkedIn);
+                              }
+
+                              if (!await launchUrl(linkedInUri,
+                                  mode: LaunchMode.externalApplication)) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Could not open LinkedIn'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              }
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content:
+                                        Text('Error launching LinkedIn: $e'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            }
                           },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.red,
-                            elevation: 0,
-                          ),
-                          child: const Text("Edit"),
+                        ),
+
+                        Divider(
+                          indent: MediaQuery.of(context).size.width * 0.1,
+                          endIndent: MediaQuery.of(context).size.width * 0.1,
+                          color: Colors.grey.shade400,
+                          thickness: 1,
+                        ),
+                        // Buttons Row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => QRCodeScreen(
+                                      name: name,
+                                      email: email,
+                                      phone: phone,
+                                      linkedIn: linkedIn,
+                                      photoUrl: photoUrl,
+                                      organization: organization,
+                                      title: title,
+                                    ),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.red,
+                                elevation: 0,
+                              ),
+                              child: const Text('Share'),
+                            ),
+                            const SizedBox(width: 16),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => FormPage(),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.red,
+                                elevation: 0,
+                              ),
+                              child: const Text("Edit"),
+                            ),
+                          ],
                         ),
                       ],
                     ),
